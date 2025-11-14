@@ -1,0 +1,50 @@
+{% extends 'tienda/base.html' %}
+
+{% block title %}Confirmar Eliminación{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    Confirmar Eliminación
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <div>
+                        <strong>¡Atención!</strong> Al eliminar este producto, se removerá de la lista de productos activos,
+                        pero quedará registrado en la base de datos para referencia histórica.
+                    </div>
+                </div>
+
+                <p>¿Está seguro que desea <strong>eliminar</strong> el siguiente producto?</p>
+
+                <div class="p-3 bg-light rounded">
+                    <h5 class="fw-bold text-danger">{{ producto.nombre }}</h5>
+                    <p class="mb-1"><strong>💰 Precio:</strong> ${{ producto.precio|floatformat:2 }}</p>
+                    <p class="mb-1">
+                        <strong>📦 Stock:</strong>
+                        {{ producto.stock }}
+                        {% if producto.stock == 1 %} unidad {% else %} unidades {% endif %}
+                    </p>
+                    <p class="mb-0"><strong>🏷️ Categoría:</strong> {{ producto.categoria.nombre }}</p>
+                </div>
+
+                <form method="post" class="mt-4 d-flex justify-content-between">
+                    {% csrf_token %}
+                    <a href="{% url 'producto_lista' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash-fill"></i> Sí, Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

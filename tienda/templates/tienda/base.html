@@ -1,0 +1,149 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Tienda{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-store"></i> Sistema Tienda
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+
+                <ul class="navbar-nav me-auto">
+
+                    <!-- Inicio: Todos los roles -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+
+                    <!-- Productos y Categorías: Todos los roles -->
+                    {% if user.perfil.es_administrador or user.perfil.es_gerente or user.perfil.es_vendedor or user.perfil.es_cliente %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'producto_lista' %}">
+                            <i class="fas fa-box"></i> Productos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'categoria_lista' %}">
+                            <i class="fas fa-tags"></i> Categorías
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Proveedores: Administrador, Gerente y Vendedor -->
+                    {% if user.perfil.es_administrador or user.perfil.es_gerente or user.perfil.es_vendedor %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'proveedor_lista' %}">
+                            <i class="fas fa-truck"></i> Proveedores
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Clientes: Administrador, Gerente y Vendedor -->
+                    {% if user.perfil.es_administrador or user.perfil.es_gerente or user.perfil.es_vendedor %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cliente_lista' %}">
+                            <i class="fas fa-users"></i> Clientes
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Ventas: Administrador, Gerente y Vendedor -->
+                    {% if user.perfil.es_administrador or user.perfil.es_gerente or user.perfil.es_vendedor %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reporte_ventas' %}">
+                            <i class="fas fa-chart-line"></i> Ventas
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Solo Cliente: Mi Perfil y Mis Compras -->
+                    {% if user.perfil.es_cliente %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cliente_mi_perfil' %}">
+                            <i class="fas fa-user"></i> Mi Perfil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'mis_compras' %}">
+                            <i class="fas fa-shopping-cart"></i> Mis Compras
+                        </a>
+                    </li>
+                    {% endif %}
+
+                </ul>
+
+                <!-- Menú del usuario (derecha) -->
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'logout' %}">
+                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Contenedor principal -->
+    <div class="container mt-4">
+
+        <!-- Mensajes de Django -->
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Pie de página -->
+    <footer class="footer mt-5 py-3 bg-light">
+        <div class="container text-center">
+            <span class="text-muted">© 2025 Sistema de Tienda - Práctica Universitaria</span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

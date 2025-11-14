@@ -1,0 +1,47 @@
+{% extends 'tienda/base.html' %}
+
+{% block title %}Confirmar Eliminación{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    Confirmar Eliminación
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <div>
+                        <strong>¡Atención!</strong> Al desactivar este cliente, se ocultará de la lista de clientes activos,
+                        pero no se eliminará permanentemente de la base de datos.
+                    </div>
+                </div>
+
+                <p>¿Está seguro que desea <strong>desactivar</strong> al siguiente cliente?</p>
+
+                <div class="p-3 bg-light rounded">
+                    <h5 class="fw-bold text-danger">{{ cliente.nombre }}</h5>
+                    <p class="mb-1"><strong>ID:</strong> {{ cliente.id }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ cliente.correo }}</p>
+                    <p class="mb-1"><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+                    <p class="mb-0"><strong>Dirección:</strong> {{ cliente.direccion }}</p>
+                </div>
+
+                <form method="post" class="mt-4 d-flex justify-content-between">
+                    {% csrf_token %}
+                    <a href="{% url 'cliente_lista' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-person-x-fill"></i> Sí, Desactivar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

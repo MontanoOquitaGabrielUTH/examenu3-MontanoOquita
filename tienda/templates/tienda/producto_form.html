@@ -1,0 +1,50 @@
+{% extends 'tienda/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ form.instance.pk|yesno:"Editar Producto,Nuevo Producto" }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white">
+                <h3 class="mb-0">{{ form.instance.pk|yesno:"Editar Producto,Nuevo Producto" }}</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+
+                    <div class="text-end mt-3">
+                        <!-- Botón Guardar -->
+                        <button type="submit" class="btn btn-success me-2">
+                            Guardar
+                        </button>
+
+                        <!-- Botón Cancelar -->
+                        <a href="{% url 'producto_lista' %}" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- === Agregamos los scripts y estilos de Select2 === -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Aplica el estilo Select2 al campo de proveedores
+        $('#id_proveedores').select2({
+            placeholder: 'Seleccione uno o más proveedores',
+            width: '100%',
+            allowClear: true
+        });
+    });
+</script>
+{% endblock %}

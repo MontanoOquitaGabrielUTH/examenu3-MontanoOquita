@@ -1,0 +1,225 @@
+{% extends 'tienda/base.html' %}
+{% load humanize %}
+
+{% block title %}
+{% if es_periodo %}
+Reporte de Ventas del Periodo
+{% else %}
+Reporte de Ventas del Día
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<!-- Encabezado -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="display-6">
+            <i class="fas fa-chart-line"></i>
+            {% if es_periodo %}
+            Reporte de Ventas del Periodo
+            {% else %}
+            Reporte de Ventas del Día
+            {% endif %}
+        </h1>
+
+        <p class="text-muted mb-0">
+            {% if es_periodo %}
+            Del {{ fecha_inicio }} al {{ fecha_fin }}
+            {% else %}
+            {{ fecha_actual|date:"l, d F Y" }}
+            {% endif %}
+        </p>
+
+    </div>
+</div>
+
+
+
+<!-- Botones superiores: Generar Reporte y Registrar Venta -->
+<div class="row mb-4">
+    <div class="col-md-12 text-end">
+        {% comment %}
+        Se habilita el botón solo si puede_generar_reporte es True.
+        Se agrega fallback por si el usuario no tiene perfil.
+        {% endcomment %}
+        {% if puede_generar_reporte|default_if_none:False %}
+        <form method="get" class="d-inline">
+            <input type="hidden" name="inicio" value="{{ fecha_inicio|date:'Y-m-d' }}">
+            <input type="hidden" name="fin" value="{{ fecha_fin|date:'Y-m-d' }}">
+
+            <button type="submit" name="generar_reporte" value="1"
+                class="btn btn-info btn-md me-2 shadow-sm d-inline-flex align-items-center">
+                <i class="fas fa-chart-bar me-2"></i> Generar Reporte
+            </button>
+        </form>
+        {% else %}
+        <button type="button" class="btn btn-secondary btn-md me-2 shadow-sm d-inline-flex align-items-center" disabled
+            title="Solo administradores y gerentes pueden generar reportes">
+            <i class="fas fa-chart-bar me-2"></i> Generar Reporte
+        </button>
+        {% endif %}
+
+        <a href="{% url 'venta_crear' %}?inicio={{ fecha_inicio }}&fin={{ fecha_fin }}"
+            class="btn btn-success btn-md shadow-sm d-inline-flex align-items-center">
+            <i class="fas fa-plus me-2"></i> Registrar Venta
+        </a>
+    </div>
+</div>
+
+<!-- Tarjetas estadísticas -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card bg-success text-white shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2">
+                    {% if es_periodo %} Total Vendido en el Periodo {% else %} Total Vendido Hoy {% endif %}
+                </h6>
+                <h2 class="card-title mb-0">${{ total_ventas_dia|floatformat:2|intcomma }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-info text-white shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2">Número de Ventas</h6>
+                <h2 class="card-title mb-0">{{ cantidad_ventas }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-dark shadow-sm">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2">Promedio por Venta</h6>
+                <h2 class="card-title mb-0">${{ promedio_venta|floatformat:2|intcomma }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtro de fechas -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <input type="date" name="inicio" value="{{ fecha_inicio }}" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <input type="date" name="fin" value="{{ fecha_fin }}" class="form-control">
+            </div>
+            <div class="col-md-4 text-start">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de ventas -->
+<div class="card mb-4">
+    <div class="card-body">
+        {% if ventas %}
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Fecha</th>
+                        <th>Precio Unit.</th>
+                        <th>Total</th>
+                        <th>Vendedor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td>{{ venta.id }}</td>
+                        <td>{{ venta.cliente.nombre }} {{ venta.cliente.apellido }}</td>
+                        <td>{{ venta.producto.nombre }}</td>
+                        <td>{{ venta.cantidad }}</td>
+                        <td>{{ venta.fecha_venta|date:"d/m/Y H:i" }}</td>
+                        <td>${{ venta.precio_unitario|floatformat:2|intcomma }}</td>
+                        <td>${{ venta.total|floatformat:2|intcomma }}</td>
+                        <td>{{ venta.vendedor.username }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6" class="text-end fw-bold">
+                            {% if es_periodo %}
+                            TOTAL DEL PERIODO:
+                            {% else %}
+                            TOTAL DEL DÍA:
+                            {% endif %}
+                        </td>
+                        <td class="fw-bold text-success">
+                            ${{ total_ventas_dia|floatformat:2|intcomma }}
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5 text-muted">
+            <i class="fas fa-inbox fa-4x mb-3"></i>
+            <p>No hay ventas registradas en este periodo.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Reportes adicionales -->
+{% if clientes_frecuentes or top_productos %}
+<hr>
+<div class="row">
+
+    <!-- Clientes Frecuentes + Top Productos -->
+    <div class="col-md-6 mb-4">
+
+        {% if clientes_frecuentes %}
+        <h4>Clientes Frecuentes</h4>
+        <ul class="list-group mb-4">
+            {% for c in clientes_frecuentes %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ c.nombre_completo }}</strong><br>
+                    <small class="text-muted">
+                        Compras: {{ c.total_compras }} | Total gastado: ${{ c.total_gastado|floatformat:2|intcomma }}
+                    </small>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if top_productos %}
+        <h4>Productos Más Vendidos</h4>
+        <ul class="list-group">
+            {% for p in top_productos %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>{{ p.producto__nombre }}</strong>
+                <span class="badge bg-primary rounded-pill">{{ p.cantidad_total }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+    </div>
+
+    {% if ventas_por_producto_html %}
+    <div class="col-md-6 mb-4">
+        <h4>Ventas por Producto</h4>
+        {{ ventas_por_producto_html|safe }}
+    </div>
+    {% endif %}
+
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "tienda/base.html" %}
+{% block content %}
+
+<div class="container mt-5" style="max-width: 650px;">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-danger text-white fw-bold d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirmar Eliminación
+        </div>
+
+        <div class="card-body bg-light">
+            <div class="alert alert-warning d-flex align-items-center" role="alert">
+                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                <div><strong>¡Atención!</strong> Esta acción no se puede deshacer.</div>
+            </div>
+
+            <p class="text-muted mb-3">¿Está seguro que desea eliminar el siguiente proveedor?</p>
+
+            <div class="card p-3 shadow-sm border-0" style="background-color: #f9fafb;">
+                <h5 class="fw-bold text-dark mb-3">{{ proveedor.nombre }}</h5>
+                <p class="mb-1"><i class="bi bi-building text-primary me-2"></i><strong>Empresa:</strong> {{ proveedor.empresa }}</p>
+                <p class="mb-1"><i class="bi bi-telephone text-success me-2"></i><strong>Teléfono:</strong> {{ proveedor.telefono }}</p>
+                <p class="mb-0"><i class="bi bi-envelope text-info me-2"></i><strong>Email:</strong> {{ proveedor.email }}</p>
+            </div>
+
+            <form method="post" class="mt-4 d-flex justify-content-between align-items-center">
+                {% csrf_token %}
+                <a href="{% url 'proveedor_lista' %}" class="btn btn-secondary px-4">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-danger px-4">
+                    <i class="bi bi-trash-fill"></i> Sí, Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

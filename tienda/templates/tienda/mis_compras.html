@@ -1,0 +1,35 @@
+{% extends 'tienda/base.html' %}
+
+{% block title %}Mis Compras{% endblock %}
+
+{% block content %}
+<h2>Mis Compras</h2>
+
+{% if ventas %}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for venta in ventas %}
+        <tr>
+            <td>{{ venta.id }}</td>
+            <td>{{ venta.producto.nombre }}</td>
+            <td>{{ venta.cantidad }}</td>
+            <td>${{ venta.producto.precio|floatformat:2 }}</td>
+            <td>{{ venta.fecha|date:"d/m/Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No has realizado compras aún.</p>
+{% endif %}
+
+{% endblock %}

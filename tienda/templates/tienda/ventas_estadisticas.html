@@ -1,0 +1,100 @@
+{% extends 'tienda/base.html' %}
+{% block title %}Estadísticas de Ventas{% endblock %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">📊 Estadísticas de Ventas</h2>
+
+    <!-- FILTRO POR FECHAS -->
+    <form method="get" class="row mb-4">
+        <div class="col-md-5">
+            <label class="form-label">Desde:</label>
+            <input type="date" name="fecha_inicio" class="form-control" value="{{ fecha_inicio }}">
+        </div>
+        <div class="col-md-5">
+            <label class="form-label">Hasta:</label>
+            <input type="date" name="fecha_fin" class="form-control" value="{{ fecha_fin }}">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-filter"></i> Filtrar
+            </button>
+        </div>
+    </form>
+
+    <!-- DATOS RESUMIDOS -->
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h5>Total Ventas</h5>
+                    <h3 class="text-success">${{ total_ventas|floatformat:2 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-info">
+                <div class="card-body">
+                    <h5>Número de Ventas</h5>
+                    <h3 class="text-info">{{ numero_ventas }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-warning">
+                <div class="card-body">
+                    <h5>Productos Más Vendidos</h5>
+                    <ul class="list-unstyled mb-0">
+                        {% for p in productos_mas_vendidos %}
+                        <li>{{ p.producto__nombre }} - {{ p.total_vendido }} unidades</li>
+                        {% empty %}
+                        <li>No hay datos</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRÁFICA -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="text-center mb-3">Ventas por Producto</h5>
+            <canvas id="ventasPorProducto"></canvas>
+        </div>
+    </div>
+</div>
+
+<script type="text/template" id="chart-data">
+    const labels = [{% for v in ventas_por_producto %}
+        "{{ v.producto__nombre }}"{% if not forloop.last %}, {% endif %}
+    {% endfor %}];
+
+    const data = [{% for v in ventas_por_producto %}
+        {{ v.total }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}];
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const ctx = document.getElementById("ventasPorProducto");
+    const template = document.getElementById("chart-data").innerText;
+    eval(template);
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Ventas ($)',
+                data,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    });
+});
+</script>
+{% endblock %}
